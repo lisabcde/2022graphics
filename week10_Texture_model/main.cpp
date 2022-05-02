@@ -1,7 +1,8 @@
 #include <opencv/highgui.h> ///使用 OpenCV 2.1 比較簡單, 只要用 High GUI 即可
 #include <opencv/cv.h>
-#include <GL/glut.h>531ul
-GLUquadric *sphere =NULL;///一個指到二次曲面的指標
+#include <GL/glut.h>
+#include "glm.h"
+GLUquadric *pmodle =NULL;///一個指到二次曲面的指標
 int myTexture(char * filename)
 {
     IplImage * img = cvLoadImage(filename); ///OpenCV讀圖
@@ -23,13 +24,17 @@ void display()
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPushMatrix();
-        glRotatef(angle,0,-1,0);
-        glRotated(90,1,0,0);
-        gluQuadricTexture(sphere,1);
-        gluSphere(sphere,1,30,30);
+        glRotatef(angle,0,1,0);
+        if(pmodle==NULL){
+            pmodle = glmReadOBJ("data/Gundam.obj");
+            glmUnitize(pmodle);
+            glmFacetNormals(pmodle);
+            glmVertexNormals(pmodle,90);
+        }
+        glmDraw(pmodle,GLM_MATERIAL | GLM_TEXTURE);
     glPopMatrix();
     glutSwapBuffers();
-    angle++;
+    angle+=1;
 }
 int main(int argc, char**argv)
 {
@@ -39,8 +44,7 @@ int main(int argc, char**argv)
 
     glutIdleFunc(display);
     glutDisplayFunc(display);
-    myTexture("earth.jpg");
-    sphere = gluNewQuadric();
+    myTexture("data/Diffuse.jpg");
     glEnable(GL_DEPTH_TEST);
     glutMainLoop();
 
